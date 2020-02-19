@@ -21,10 +21,14 @@ const styles = StyleSheet.create({
   },
 });
 
+const initialState = {
+  currentValue: "0", //setting to 0 as a string
+  operator: null,
+  previousValue: null,
+};
+
 export default class App extends React.Component {
-  state = {
-    currentValue: "0", //setting to 0 as a string
-  };
+  state = initialState;
 
   handleTap = (type, value) => {
     this.setState(state => { //leveraging currentValue of state inside the functions
@@ -34,6 +38,71 @@ export default class App extends React.Component {
         }
         return {
         currentValue: `${state.currentValue}${value}` //appending the number
+        };
+      }
+
+      if (type === "operator") {
+        return {
+          operator: value, //go back to 0 when inputting a new number
+          previousValue: state.currentValue, //currentValue will be stored to previousValue
+          currentValue: "0", //currentValue is now empty
+        };
+      }
+
+      if (type === "equal") {
+        const { currentValue, previousValue, operator } = state;
+
+        //converted from String to Float
+        const current = parseFloat(currentValue);
+        const previous = parseFloat(previousValue);
+        const resetState = {
+          operator: null,
+          previousValue: null,
+        };
+
+        if (operator === "/") {
+          return {
+            currentValue: previous / current,
+            ...resetState
+          };
+        }
+
+        if (operator === "*") {
+          return {
+            currentValue: previous * current,
+            ...resetState
+          };
+        }
+
+        if (operator === "+") {
+          return {
+            currentValue: previous + current,
+            ...resetState
+          };
+        }
+
+        if (operator === "-") {
+          return {
+            currentValue: previous - current,
+            ...resetState
+          };
+        }
+
+      }
+
+      if (type === "clear") {
+        return initialState;
+      }
+
+      if (type === "posneg") {
+        return {
+          currentValue: `${parseFloat(state.currentValue) * -1}`
+        };
+      }
+
+      if (type === "percentage") {
+        return {
+          currentValue: `${parseFloat(state.currentValue) * 0.01}`
         };
       }
 
@@ -50,9 +119,9 @@ export default class App extends React.Component {
             {parseFloat(this.state.currentValue).toLocaleString()}
           </Text>
           <Row>
-            <Button text="C" theme="secondary" onPress={() => this.handleTap("operator")} />
-            <Button text="+/-" theme="secondary" onPress={() => this.handleTap("number")} />
-            <Button text="%" theme="secondary" onPress={() => this.handleTap("operator")} />
+            <Button text="C" theme="secondary" onPress={() => this.handleTap("clear")} />
+            <Button text="+/-" theme="secondary" onPress={() => this.handleTap("posneg")} />
+            <Button text="%" theme="secondary" onPress={() => this.handleTap("percentage")} />
             <Button text="/" theme="accent" onPress={() => this.handleTap("operator", "/")} />
           </Row>
 
@@ -60,7 +129,7 @@ export default class App extends React.Component {
             <Button text="7" onPress={() => this.handleTap("number", 7)} />
             <Button text="8" onPress={() => this.handleTap("number", 8)} />
             <Button text="9" onPress={() => this.handleTap("number", 9)} />
-            <Button text="x" theme="accent" onPress={() => this.handleTap("operator", "x")} />
+            <Button text="x" theme="accent" onPress={() => this.handleTap("operator", "*")} />
           </Row>
 
           <Row>
@@ -80,7 +149,7 @@ export default class App extends React.Component {
           <Row>
             <Button text="0" size="double" onPress={() => this.handleTap("number", 0)} />
             <Button text="." onPress={() => this.handleTap("number", ".")} />
-            <Button text="=" theme="accent" onPress={() => this.handleTap("operator", "=")} />
+            <Button text="=" theme="accent" onPress={() => this.handleTap("equal")} />
           </Row>
         </SafeAreaView>
       </View>
