@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, StatusBar, SafeAreaView, Dimensions } from 'rea
 
 import Button from './components/Button';
 import Row from './components/Row';
+import calculator, {initialState} from './util/calculator';
 
 const screen = Dimensions.get('window');
 
@@ -21,93 +22,12 @@ const styles = StyleSheet.create({
   },
 });
 
-const initialState = {
-  currentValue: "0", //setting to 0 as a string
-  operator: null,
-  previousValue: null,
-};
-
 export default class App extends React.Component {
   state = initialState;
 
   handleTap = (type, value) => {
-    this.setState(state => { //leveraging currentValue of state inside the functions
-      if (type === "number") {
-        if (state.currentValue === "0") {
-          return {currentValue: `${value}`} //removes the 0
-        }
-        return {
-        currentValue: `${state.currentValue}${value}` //appending the number
-        };
-      }
-
-      if (type === "operator") {
-        return {
-          operator: value, //go back to 0 when inputting a new number
-          previousValue: state.currentValue, //currentValue will be stored to previousValue
-          currentValue: "0", //currentValue is now empty
-        };
-      }
-
-      if (type === "equal") {
-        const { currentValue, previousValue, operator } = state;
-
-        //converted from String to Float
-        const current = parseFloat(currentValue);
-        const previous = parseFloat(previousValue);
-        const resetState = {
-          operator: null,
-          previousValue: null,
-        };
-
-        if (operator === "/") {
-          return {
-            currentValue: previous / current,
-            ...resetState
-          };
-        }
-
-        if (operator === "*") {
-          return {
-            currentValue: previous * current,
-            ...resetState
-          };
-        }
-
-        if (operator === "+") {
-          return {
-            currentValue: previous + current,
-            ...resetState
-          };
-        }
-
-        if (operator === "-") {
-          return {
-            currentValue: previous - current,
-            ...resetState
-          };
-        }
-
-      }
-
-      if (type === "clear") {
-        return initialState;
-      }
-
-      if (type === "posneg") {
-        return {
-          currentValue: `${parseFloat(state.currentValue) * -1}`
-        };
-      }
-
-      if (type === "percentage") {
-        return {
-          currentValue: `${parseFloat(state.currentValue) * 0.01}`
-        };
-      }
-
-      return state;
-    });
+    this.setState(state => //leveraging currentValue of state inside the functions
+      calculator(type, value, state));
   };
 
   render() {
