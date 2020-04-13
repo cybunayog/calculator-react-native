@@ -26,7 +26,8 @@ export default class App extends React.Component {
   state = initialState;
 
   handleTap = (type, value) => {
-    this.setState(state => //leveraging currentValue of state inside the functions
+    this.setState(state =>
+      //leveraging currentValue of state inside the functions
       calculator(type, value, state));
   };
 
